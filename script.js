@@ -1,5 +1,7 @@
-// Google OAuth конфигурация
-const GOOGLE_CLIENT_ID = '728085463649-ct67i38l6hf0j5ii9aqdi35mv1vn5be7.apps.googleusercontent.com';
+// Google OAuth конфигурация - получить из API или использовать переменные окружения
+const GOOGLE_CLIENT_ID = window.location.hostname === 'localhost' 
+    ? '728085463649-ct67i38l6hf0j5ii9aqdi35mv1vn5be7.apps.googleusercontent.com'
+    : '728085463649-ct67i38l6hf0j5ii9aqdi35mv1vn5be7.apps.googleusercontent.com';
 
 // Разрешенные email адреса
 const ALLOWED_EMAILS = [
@@ -106,20 +108,6 @@ function checkAuthStatus() {
     if (user) {
         try {
             const userData = JSON.parse(user);
-            showUserInfo(userData);
-        } catch (error) {
-            console.error('Ошибка парсинга данных пользователя:', error);
-            localStorage.removeItem('user');
-        }
-    }
-}
-
-// Проверка статуса авторизации
-function checkAuthStatus() {
-    const user = localStorage.getItem('user');
-    if (user) {
-        try {
-            const userData = JSON.parse(user);
             console.log('Пользователь уже авторизован:', userData);
             showUserInfo(userData);
         } catch (error) {
@@ -145,20 +133,70 @@ function signOut() {
 // Обработчики событий
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM загружен, инициализация...');
+    console.log('Текущий домен:', window.location.hostname);
+    console.log('Полный URL:', window.location.href);
+    
+    // Показываем диагностическую информацию
+    const debugInfo = document.getElementById('debugInfo');
+    const currentDomain = document.getElementById('currentDomain');
+    const googleStatus = document.getElementById('googleStatus');
+    
+    if (currentDomain) {
+        currentDomain.textContent = window.location.hostname;
+    }
+    
+    // Показываем диагностику при нажатии Ctrl+Shift+D
+    document.addEventListener('keydown', function(e) {
+        if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+            debugInfo.style.display = debugInfo.style.display === 'none' ? 'block' : 'none';
+        }
+    });
+    
+    // Обновляем статус Google
+    function updateGoogleStatus() {
+        if (googleStatus) {
+            if (typeof google !== 'undefined' && google.accounts && google.accounts.id) {
+                googleStatus.textContent = '✅ Загружен';
+                googleStatus.style.color = 'green';
+            } else {
+                googleStatus.textContent = '❌ Не загружен';
+                googleStatus.style.color = 'red';
+            }
+        }
+    }
     
     // Инициализируем Google Sign-In
     initializeGoogleSignIn();
     
+    // Обновляем статус каждые 2 секунды
+    setInterval(updateGoogleStatus, 2000);
+    updateGoogleStatus();
+    
     // Обработчик кнопки Google
-    document.getElementById('googleSignIn').addEventListener('click', function() {
+    document.getElementById('googleSignIn').addEventListener('click', function(e) {
+        e.preventDefault();
         console.log('Клик по кнопке Google Sign-In');
+        console.log('Google объект доступен:', typeof google !== 'undefined');
+        console.log('Google accounts доступен:', typeof google !== 'undefined' && google.accounts);
+        console.log('Google accounts.id доступен:', typeof google !== 'undefined' && google.accounts && google.accounts.id);
         
         if (typeof google !== 'undefined' && google.accounts && google.accounts.id) {
             console.log('Запуск Google Sign-In...');
-            google.accounts.id.prompt();
+            try {
+                google.accounts.id.prompt();
+            } catch (error) {
+                console.error('Ошибка при запуске Google Sign-In:', error);
+                // Попробуем альтернативный способ
+                google.accounts.id.renderButton(
+                    document.getElementById('googleSignIn'),
+                    { theme: 'outline', size: 'large' }
+                );
+            }
         } else {
-            console.error('Google Sign-In не загружен');
-            alert('Google Sign-In не загружен. Обновите страницу.');
+            console.error('Google Sign-In не загружен. Попытка повторной инициализации...');
+            setTimeout(() => {
+                initializeGoogleSignIn();
+            }, 1000);
         }
     });
     
