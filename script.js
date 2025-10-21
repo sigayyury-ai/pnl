@@ -1,7 +1,5 @@
-// Google OAuth конфигурация - получить из API или использовать переменные окружения
-const GOOGLE_CLIENT_ID = window.location.hostname === 'localhost' 
-    ? '728085463649-ct67i38l6hf0j5ii9aqdi35mv1vn5be7.apps.googleusercontent.com'
-    : '728085463649-ct67i38l6hf0j5ii9aqdi35mv1vn5be7.apps.googleusercontent.com';
+// Google OAuth конфигурация - правильный Client ID
+const GOOGLE_CLIENT_ID = '728085463649-jj9dlee9rek2r0k429sh6i6m9ec8582n.apps.googleusercontent.com';
 
 // Разрешенные email адреса
 const ALLOWED_EMAILS = [

@@ -17,7 +17,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Конфигурация
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '728085463649-ct67i38l6hf0j5ii9aqdi35mv1vn5be7.apps.googleusercontent.com';
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '728085463649-jj9dlee9rek2r0k429sh6i6m9ec8582n.apps.googleusercontent.com';
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 const ALLOWED_EMAILS = process.env.ALLOWED_EMAILS ? process.env.ALLOWED_EMAILS.split(',') : ['hello@comoon.io', 'info@comoon.io'];
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
