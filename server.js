@@ -17,33 +17,58 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Конфигурация
-const GOOGLE_CLIENT_ID = '728085463649-ct67i38l6hf0j5ii9aqdi35mv1vn5be7.apps.googleusercontent.com';
-const ALLOWED_EMAILS = ['hello@comoon.io', 'info@comoon.io'];
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '728085463649-ct67i38l6hf0j5ii9aqdi35mv1vn5be7.apps.googleusercontent.com';
+const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+const ALLOWED_EMAILS = process.env.ALLOWED_EMAILS ? process.env.ALLOWED_EMAILS.split(',') : ['hello@comoon.io', 'info@comoon.io'];
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const DEMO_MODE = process.env.DEMO_MODE === 'true' || true;
 
 // Supabase клиент
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_KEY
-);
+let supabase = null;
+try {
+  if (process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_KEY) {
+    supabase = createClient(
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_KEY
+    );
+    console.log('✅ Supabase client initialized');
+  } else {
+    console.warn('⚠️ Supabase credentials not found');
+  }
+} catch (error) {
+  console.error('❌ Failed to initialize Supabase:', error.message);
+}
 
 // Google OAuth клиент
-const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
+let googleClient = null;
+try {
+  if (GOOGLE_CLIENT_ID) {
+    googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
+    console.log('✅ Google OAuth client initialized');
+  } else {
+    console.warn('⚠️ Google Client ID not found');
+  }
+} catch (error) {
+  console.error('❌ Failed to initialize Google OAuth:', error.message);
+}
 
 // OpenAI клиент
 const openai = OPENAI_API_KEY ? new OpenAI({
   apiKey: OPENAI_API_KEY,
 }) : null;
 
-// Создаем папку uploads если её нет
-if (!fs.existsSync('uploads')) {
-  fs.mkdirSync('uploads', { recursive: true });
+// Создаем папку uploads если её нет (только если не production или если папка доступна)
+if (process.env.NODE_ENV !== 'production' && !fs.existsSync('uploads')) {
+  try {
+    fs.mkdirSync('uploads', { recursive: true });
+  } catch (err) {
+    console.warn('Could not create uploads directory:', err.message);
+  }
 }
 
 // Настройка multer для загрузки файлов
 const upload = multer({ 
-  dest: 'uploads/',
+  dest: process.env.NODE_ENV === 'production' ? '/tmp/' : 'uploads/',
   limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
 });
 
@@ -82,6 +107,10 @@ app.use(express.static(__dirname, {
 // Функция для проверки Google токена
 async function verifyGoogleToken(token) {
   try {
+    if (!googleClient) {
+      throw new Error('Google OAuth not configured');
+    }
+    
     const ticket = await googleClient.verifyIdToken({
       idToken: token,
       audience: GOOGLE_CLIENT_ID,
@@ -261,6 +290,11 @@ app.post('/api/pnl', async (req, res) => {
 // Вспомогательные функции для работы с категориями
 async function getCategories() {
   try {
+    if (!supabase) {
+      console.warn('Supabase not initialized, returning empty categories');
+      return { income: [], expense: [] };
+    }
+    
     const [incomeResult, expenseResult] = await Promise.all([
       supabase.from('pnl_income_categories').select('*').order('name'),
       supabase.from('pnl_expense_categories').select('*').order('name')
