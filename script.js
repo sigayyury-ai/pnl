@@ -43,7 +43,10 @@ async function initializeGoogleSignIn() {
             client_id: GOOGLE_CLIENT_ID,
             callback: handleCredentialResponse,
             auto_select: false,
-            cancel_on_tap_outside: false
+            cancel_on_tap_outside: false,
+            context: 'signin',
+            use_fedcm_for_prompt: false,
+            use_google_one_tap: false
         });
         
         // Проверяем, авторизован ли пользователь
@@ -207,14 +210,27 @@ document.addEventListener('DOMContentLoaded', function() {
         if (typeof google !== 'undefined' && google.accounts && google.accounts.id && GOOGLE_CLIENT_ID) {
             console.log('Запуск Google Sign-In...');
             try {
-                google.accounts.id.prompt();
+                // Проверяем, что Google Sign-In готов
+                google.accounts.id.prompt((notification) => {
+                    console.log('Google Sign-In prompt notification:', notification);
+                    if (notification.isNotDisplayed()) {
+                        console.error('Google Sign-In не может быть показан:', notification.getNotDisplayedReason());
+                        // Попробуем рендер кнопки как запасной вариант
+                        try {
+                            google.accounts.id.renderButton(
+                                document.getElementById('googleSignIn'),
+                                { theme: 'outline', size: 'large', text: 'signin_with' }
+                            );
+                        } catch (renderError) {
+                            console.error('Ошибка рендера кнопки:', renderError);
+                        }
+                    } else if (notification.isSkippedMoment()) {
+                        console.error('Google Sign-In пропущен:', notification.getSkippedReason());
+                    }
+                });
             } catch (error) {
                 console.error('Ошибка при запуске Google Sign-In:', error);
-                // Попробуем альтернативный способ
-                google.accounts.id.renderButton(
-                    document.getElementById('googleSignIn'),
-                    { theme: 'outline', size: 'large' }
-                );
+                alert('Ошибка авторизации. Попробуйте обновить страницу.');
             }
         } else {
             console.error('Google Sign-In не загружен или отсутствует Client ID. Попытка повторной инициализации...');

@@ -77,21 +77,43 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "https://accounts.google.com"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      imgSrc: ["'self'", "data:", "https:"],
-      connectSrc: ["'self'", "https://oauth2.googleapis.com", "https://accounts.google.com"],
-      fontSrc: ["'self'", "https:"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://accounts.google.com", "https://apis.google.com"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://accounts.google.com", "https://apis.google.com"],
+      styleSrcElem: ["'self'", "'unsafe-inline'", "https://accounts.google.com", "https://apis.google.com"],
+      imgSrc: ["'self'", "data:", "https:", "blob:"],
+      connectSrc: ["'self'", "https://oauth2.googleapis.com", "https://accounts.google.com", "https://apis.google.com"],
+      fontSrc: ["'self'", "https:", "data:"],
       objectSrc: ["'none'"],
       mediaSrc: ["'self'"],
-      frameSrc: ["https://accounts.google.com"],
+      frameSrc: ["https://accounts.google.com", "https://apis.google.com"],
       frameAncestors: ["'none'"],
     },
   },
 }));
-app.use(cors());
+
+// CORS configuration
+app.use(cors({
+  origin: [
+    'https://pnl-4ml3.onrender.com',
+    'http://localhost:3000',
+    'http://127.0.0.1:3000'
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  exposedHeaders: ['Content-Length', 'X-Foo', 'X-Bar']
+}));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
+
+// CORS preflight handling
+app.options('*', (req, res) => {
+  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.sendStatus(200);
+});
 
 // Статические файлы
 app.use(express.static(__dirname, {
