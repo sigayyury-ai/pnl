@@ -1,0 +1,6 @@
+date,description,amount,currency
+2025-01-15,Test income payment,1500.00,EUR
+2025-01-16,Office supplies purchase,-50.75,USD
+2025-01-17,Rent payment,-800,PLN
+2025-01-18,Food expenses,-25.50,EUR
+2025-01-19,Client payment,2000.00,USD

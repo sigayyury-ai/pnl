@@ -33,7 +33,10 @@ async function initializeGoogleSignIn() {
     // Ждем загрузки Google библиотеки
     if (typeof google === 'undefined') {
         console.log('Ожидание загрузки Google Sign-In...');
-        setTimeout(initializeGoogleSignIn, 100);
+        // Use requestAnimationFrame for better performance
+        requestAnimationFrame(() => {
+            setTimeout(initializeGoogleSignIn, 100);
+        });
         return;
     }
     
@@ -104,8 +107,15 @@ function handleCredentialResponse(response) {
         showUserInfo(payload);
         
         // Перенаправляем на главную страницу через 2 секунды
-        setTimeout(() => {
+        // Clear any existing navigation timeout
+        if (window.navigationTimeout) {
+            clearTimeout(window.navigationTimeout);
+        }
+        
+        // Set new navigation timeout with cleanup
+        window.navigationTimeout = setTimeout(() => {
             window.location.href = '/dashboard';
+            window.navigationTimeout = null;
         }, 2000);
         
     } catch (error) {
@@ -150,11 +160,41 @@ function signOut() {
     }
 }
 
+// Проверяем режим разработки
+function isDevMode() {
+    return window.location.hostname === 'localhost' || 
+           window.location.hostname === '127.0.0.1' ||
+           window.location.port === '3000';
+}
+
 // Обработчики событий
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM загружен, инициализация...');
     console.log('Текущий домен:', window.location.hostname);
     console.log('Полный URL:', window.location.href);
+    console.log('Режим разработки:', isDevMode());
+    
+    // Если это локальная разработка, сразу перенаправляем на dashboard
+    if (isDevMode()) {
+        console.log('Локальный режим - перенаправляем на dashboard');
+        // Проверяем авторизацию
+        const userData = JSON.parse(localStorage.getItem('user') || 'null');
+        if (!userData) {
+            // Создаем фиктивного пользователя для разработки
+            const devUser = {
+                name: 'Developer',
+                email: 'dev@localhost.com',
+                picture: 'https://via.placeholder.com/40',
+                token: 'dev-token',
+                loginTime: new Date().toISOString()
+            };
+            localStorage.setItem('user', JSON.stringify(devUser));
+            console.log('Создан фиктивный пользователь для разработки:', devUser);
+        }
+        // Перенаправляем на dashboard
+        window.location.href = 'dashboard.html';
+        return;
+    }
     
     // Показываем диагностическую информацию
     const debugInfo = document.getElementById('debugInfo');
@@ -188,8 +228,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Инициализируем Google Sign-In
     initializeGoogleSignIn();
     
-    // Обновляем статус каждые 2 секунды
-    setInterval(updateGoogleStatus, 2000);
+    // Event-driven status checking instead of polling
+    document.addEventListener('DOMContentLoaded', updateGoogleStatus);
     updateGoogleStatus();
     
     // Обработчик кнопки Google
@@ -234,8 +274,15 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         } else {
             console.error('Google Sign-In не загружен или отсутствует Client ID. Попытка повторной инициализации...');
-            setTimeout(() => {
+            // Clear any existing retry timeout
+            if (window.retryTimeout) {
+                clearTimeout(window.retryTimeout);
+            }
+            
+            // Set new retry timeout with cleanup
+            window.retryTimeout = setTimeout(() => {
                 initializeGoogleSignIn();
+                window.retryTimeout = null;
             }, 1000);
         }
     });
@@ -245,4 +292,14 @@ document.addEventListener('DOMContentLoaded', function() {
     if (signOutBtn) {
         signOutBtn.addEventListener('click', signOut);
     }
+    
+    // Cleanup timeouts on page unload
+    window.addEventListener('beforeunload', function() {
+        if (window.navigationTimeout) {
+            clearTimeout(window.navigationTimeout);
+        }
+        if (window.retryTimeout) {
+            clearTimeout(window.retryTimeout);
+        }
+    });
 });

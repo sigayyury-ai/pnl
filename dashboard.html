@@ -7,9 +7,10 @@
     <link rel="stylesheet" href="styles.css">
     <style>
         .dashboard-container {
-            max-width: 800px;
-            margin: 0 auto;
+            width: 100%;
+            min-height: 100vh;
             padding: 20px;
+            background: #f5f5f5;
         }
         
         .welcome-card {
@@ -89,51 +90,1020 @@
             color: #666;
             font-size: 0.9rem;
         }
+
+        /* Новые стили для функциональности */
+        .upload-section, .categories-section, .rules-section {
+            margin-top: 30px;
+        }
+
+        .section-card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .section-card h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .upload-form {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .upload-btn, .primary-btn, .secondary-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .upload-btn {
+            background: #007bff;
+            color: white;
+        }
+
+        .upload-btn:hover {
+            background: #0056b3;
+        }
+
+        .primary-btn {
+            background: #28a745;
+            color: white;
+        }
+
+        .primary-btn:hover {
+            background: #218838;
+        }
+
+        .secondary-btn {
+            background: #6c757d;
+            color: white;
+        }
+
+        .secondary-btn:hover {
+            background: #545b62;
+        }
+
+        .upload-process-btn {
+            background: #fd7e14;
+            color: white;
+            padding: 12px 24px;
+            font-size: 16px;
+        }
+
+        .upload-process-btn:hover:not(:disabled) {
+            background: #e8690b;
+        }
+
+        .upload-process-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .file-name {
+            color: #666;
+            font-style: italic;
+        }
+
+        .year-month-selector {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .year-month-selector label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+
+        .year-month-selector select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .upload-status {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .upload-status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .upload-status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .upload-status.loading {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .upload-status.info {
+            background: #e2e3e5;
+            color: #383d41;
+            border: 1px solid #d6d8db;
+        }
+
+        .categories-controls, .rules-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .categories-list {
+            margin-top: 20px;
+        }
+
+        .categories-type-group {
+            margin-bottom: 20px;
+        }
+
+        .categories-type-group h4 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .category-item, .rule-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 15px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
+            background: #f8f9fa;
+        }
+
+        .category-item.income {
+            border-left: 4px solid #28a745;
+        }
+
+        .category-item.expense {
+            border-left: 4px solid #dc3545;
+        }
+
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .delete-btn:hover {
+            background: #c82333;
+        }
+
+        .add-category-form {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .add-category-form h4 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .add-category-form input,
+        .add-category-form select,
+        .add-category-form textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .add-category-form textarea {
+            height: 80px;
+            resize: vertical;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .rules-list {
+            margin-top: 20px;
+        }
+
+        .rule-item {
+            background: #fff;
+            border: 1px solid #ddd;
+        }
+
+        .rule-pattern {
+            font-family: monospace;
+            background: #e9ecef;
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+
+        .rule-category {
+            color: #666;
+            margin-right: 10px;
+        }
+
+        .rule-stats {
+            color: #999;
+            font-size: 12px;
+            margin-right: auto;
+        }
+
+        /* Results section styles */
+        .results-section {
+            margin-top: 30px;
+        }
+
+        .results-summary {
+            background: #e8f4fd;
+            border: 1px solid #bee5eb;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .results-summary h4 {
+            color: #0c5460;
+            margin-bottom: 10px;
+        }
+
+        .results-summary .summary-item {
+            display: inline-block;
+            margin-right: 20px;
+            margin-bottom: 5px;
+        }
+
+        .results-summary .summary-value {
+            font-weight: bold;
+            color: #155724;
+        }
+
+        .results-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .operations-list-container {
+            margin-top: 20px;
+        }
+
+        .operations-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .operations-header h4 {
+            color: #333;
+            margin: 0;
+        }
+
+        .operations-count {
+            background: #007bff;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .operations-list {
+            max-height: 500px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .operation-item {
+            display: grid;
+            grid-template-columns: 120px 1fr 100px 80px 120px 150px 50px;
+            gap: 15px;
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .operation-item:last-child {
+            border-bottom: none;
+        }
+
+        .operation-item:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .operation-header {
+            background: #007bff;
+            color: white;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .operation-date {
+            font-family: monospace;
+            font-size: 12px;
+        }
+
+        .operation-description {
+            word-break: break-word;
+        }
+
+        .operation-amount {
+            text-align: right;
+            font-weight: bold;
+        }
+
+        .operation-amount.income {
+            color: #28a745;
+        }
+
+        .operation-amount.expense {
+            color: #dc3545;
+        }
+
+        .operation-currency {
+            text-align: center;
+            font-size: 12px;
+            background: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .operation-amount-pln {
+            text-align: right;
+            font-weight: bold;
+            color: #495057;
+        }
+
+        .operation-category {
+            text-align: center;
+            background: #f8f9fa;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .operation-item.editable .operation-category {
+            cursor: pointer;
+            border: 1px dashed #007bff;
+        }
+
+        .operation-item.editable .operation-category:hover {
+            background: #e3f2fd;
+        }
+
+        .category-edit-select {
+            width: 100%;
+            padding: 4px;
+            border: 1px solid #007bff;
+            border-radius: 4px;
+            font-size: 12px;
+            background: white;
+        }
+
+        .category-edit-select:focus {
+            outline: none;
+            border-color: #0056b3;
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+        }
+
+        .operation-actions {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .delete-operation-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 32px;
+            height: 32px;
+        }
+
+        .delete-operation-btn:hover {
+            background: #c82333;
+        }
+
+        .delete-operation-btn:active {
+            background: #bd2130;
+        }
+
+        /* Navigation tabs */
+        .nav-tabs {
+            display: flex;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .nav-tab.active {
+            background: white;
+            color: #007bff;
+            border-bottom-color: #007bff;
+        }
+
+        .nav-tab:hover:not(.active) {
+            background: #e9ecef;
+        }
+
+        .logout-btn {
+            padding: 15px 20px;
+            border: none;
+            background: #dc3545;
+            color: white;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .logout-btn:hover {
+            background: #c82333;
+        }
+
+        /* Tab content */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Full width sections */
+        .section-card {
+            width: 100%;
+            max-width: none;
+        }
+
+        /* Grid layout for better space utilization */
+        .main-content {
+            display: grid;
+            gap: 20px;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        /* PNL Table Styles */
+        .pnl-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .pnl-controls label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+
+        .pnl-controls select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: white;
+        }
+
+        .pnl-table-container {
+            overflow-x: auto;
+            margin-bottom: 30px;
+        }
+
+        .pnl-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            min-width: 800px;
+        }
+
+        .pnl-table th,
+        .pnl-table td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #e9ecef;
+        }
+
+        .pnl-table th {
+            background: #495057;
+            color: white;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .pnl-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .pnl-table tr:hover {
+            background: #e3f2fd;
+        }
+
+        .pnl-table .category-row {
+            font-weight: 500;
+            background: #fff3cd !important;
+        }
+
+        .pnl-table .total-row {
+            font-weight: bold;
+            background: #d4edda !important;
+        }
+
+        .pnl-table .month-cell {
+            text-align: center;
+            min-width: 120px;
+        }
+
+        .pnl-table .editable-cell {
+            cursor: pointer;
+            position: relative;
+        }
+
+        .pnl-table .editable-cell:hover {
+            background: #e8f5e8 !important;
+        }
+
+        .pnl-table .editable-cell input {
+            width: 100%;
+            border: none;
+            background: transparent;
+            padding: 4px;
+            font-size: inherit;
+        }
+
+        .pnl-analytics {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .pnl-analytics h4 {
+            margin-bottom: 15px;
+            color: #495057;
+        }
+
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .analytics-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 15px;
+            background: white;
+            border-radius: 6px;
+            border-left: 4px solid #28a745;
+        }
+
+        .analytics-label {
+            font-weight: 500;
+            color: #495057;
+        }
+
+        .analytics-value {
+            font-weight: bold;
+            color: #28a745;
+        }
+
+        /* Marketing Section Styles */
+        .marketing-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .marketing-section h4 {
+            margin-bottom: 15px;
+            color: #495057;
+        }
+
+        .marketing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .marketing-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .marketing-item label {
+            font-weight: 500;
+            color: #495057;
+            font-size: 14px;
+        }
+
+        .marketing-input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            background: white;
+        }
+
+        .marketing-input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+        }
+
+        .marketing-calculated {
+            padding: 8px 12px;
+            background: #e9ecef;
+            border-radius: 4px;
+            font-weight: bold;
+            color: #495057;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+            .nav-tab {
+                font-size: 14px;
+                padding: 12px 15px;
+            }
+            .pnl-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .analytics-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="dashboard-container">
-        <div class="welcome-card">
-            <h1>🎉 Hello World!</h1>
-            <p>Добро пожаловать в PNL System!</p>
-            
-            <div class="user-info" id="userInfo">
-                <h3>Информация о пользователе:</h3>
-                <p><strong>Имя:</strong> <span id="userName">Загрузка...</span></p>
-                <p><strong>Email:</strong> <span id="userEmail">Загрузка...</span></p>
+        <!-- Navigation Tabs -->
+        <div class="nav-tabs">
+            <button class="nav-tab active" data-tab="main">🏠 Главная</button>
+            <button class="nav-tab" data-tab="pnl">📊 P&L Таблица</button>
+            <button class="nav-tab" data-tab="categories">📋 Категории</button>
+            <button class="nav-tab" data-tab="rules">📏 Правила</button>
+            <button class="logout-btn" onclick="logout()">🚪 Выйти</button>
+        </div>
+
+        <!-- Main Tab Content -->
+        <div class="tab-content active" id="main-tab">
+            <div class="main-content">
+                <!-- CSV Upload Section -->
+                <div class="upload-section">
+                    <div class="section-card">
+                        <h3>📁 Загрузка CSV файлов</h3>
+                        <div class="upload-form">
+                            <input type="file" id="csvFile" accept=".csv" style="display: none;">
+                            <label for="csvFile" class="upload-btn">Выбрать CSV файл</label>
+                            <span id="fileName" class="file-name"></span>
             </div>
             
-            <button class="logout-btn" onclick="logout()">Выйти из системы</button>
+                        <div class="year-month-selector" style="margin-top: 15px;">
+                            <label>Год: 
+                                <select id="yearSelect">
+                                    <option value="2025">2025</option>
+                                    <option value="2024">2024</option>
+                                    <option value="2026">2026</option>
+                                </select>
+                            </label>
+                            <label style="margin-left: 15px;">Месяц: 
+                                <select id="monthSelect">
+                                    <option value="1">Январь</option>
+                                    <option value="2">Февраль</option>
+                                    <option value="3">Март</option>
+                                    <option value="4">Апрель</option>
+                                    <option value="5">Май</option>
+                                    <option value="6">Июнь</option>
+                                    <option value="7">Июль</option>
+                                    <option value="8">Август</option>
+                                    <option value="9">Сентябрь</option>
+                                    <option value="10">Октябрь</option>
+                                    <option value="11">Ноябрь</option>
+                                    <option value="12">Декабрь</option>
+                                </select>
+                            </label>
         </div>
         
-        <div class="features">
-            <div class="feature-card">
-                <h3>📊 PNL Анализ</h3>
-                <p>Анализ прибыли и убытков с автоматической категоризацией</p>
+                        <button id="uploadBtn" class="upload-process-btn" style="margin-top: 15px;" disabled>
+                            Обработать файл
+                        </button>
+                        
+                        <div id="uploadStatus" class="upload-status" style="display: none;"></div>
+                    </div>
             </div>
             
-            <div class="feature-card">
-                <h3>🤖 AI Категоризация</h3>
-                <p>Автоматическая категоризация транзакций с помощью ChatGPT</p>
+                <!-- CSV Processing Results Section -->
+                <div class="results-section" id="resultsSection" style="display: none;">
+                    <div class="section-card">
+                        <h3>📊 Результаты обработки CSV</h3>
+                        <div class="results-summary" id="resultsSummary"></div>
+                        
+                        <div class="results-controls" style="margin: 20px 0;">
+                            <button id="exportResultsBtn" class="secondary-btn">Экспорт результатов</button>
+                            <button id="saveResultsBtn" class="primary-btn">Сохранить в базу</button>
+                            <button id="clearResultsBtn" class="secondary-btn">Очистить результаты</button>
             </div>
             
-            <div class="feature-card">
-                <h3>💱 Конвертация валют</h3>
-                <p>Автоматическая конвертация валют в PLN</p>
+                        <div class="operations-list-container">
+                            <div class="operations-header">
+                                <h4>Обработанные операции:</h4>
+                                <span id="operationsCount" class="operations-count"></span>
+                            </div>
+                            <div id="operationsList" class="operations-list">
+                                <!-- Операции будут добавлены через JavaScript -->
+                            </div>
+                        </div>
+                    </div>
             </div>
             
-            <div class="feature-card">
-                <h3>📈 Отчеты</h3>
-                <p>Детальные отчеты и аналитика по финансам</p>
+            </div>
+        </div>
+
+        <!-- PNL Tab Content -->
+        <div class="tab-content" id="pnl-tab">
+            <div class="section-card">
+                <h3>📊 P&L Таблица</h3>
+                
+                <!-- Year Selector -->
+                <div class="pnl-controls">
+                    <label>Год: 
+                        <select id="pnlYearSelect">
+                            <option value="2025">2025</option>
+                            <option value="2024">2024</option>
+                            <option value="2026">2026</option>
+                        </select>
+                    </label>
+                    <button id="loadPNLBtn" class="primary-btn">Загрузить P&L данные</button>
+                    <button id="refreshPNLBtn" class="secondary-btn">Обновить</button>
+                </div>
+                
+                <!-- PNL Table -->
+                <div id="pnlTableContainer" class="pnl-table-container">
+                    <p>Выберите год и нажмите "Загрузить P&L данные"</p>
+                </div>
+                
+                <!-- Marketing Metrics Section -->
+                <div id="marketingSection" class="marketing-section" style="display: none;">
+                    <h4>📈 Маркетинговые метрики</h4>
+                    <div class="marketing-grid">
+                        <div class="marketing-item">
+                            <label>Лиды:</label>
+                            <input type="number" id="leadsInput" placeholder="0" class="marketing-input">
+                        </div>
+                        <div class="marketing-item">
+                            <label>Сделки:</label>
+                            <input type="number" id="dealsInput" placeholder="0" class="marketing-input">
+                        </div>
+                        <div class="marketing-item">
+                            <label>Реклама (PLN):</label>
+                            <input type="number" id="adSpendInput" placeholder="0" class="marketing-input">
+                        </div>
+                        <div class="marketing-item">
+                            <label>Конверсия (%):</label>
+                            <input type="number" id="conversionInput" placeholder="0" class="marketing-input">
+                        </div>
+                        <div class="marketing-item">
+                            <label>Цена лида (PLN):</label>
+                            <span id="costPerLead" class="marketing-calculated">0</span>
+                        </div>
+                        <div class="marketing-item">
+                            <label>Цена сделки (PLN):</label>
+                            <span id="costPerDeal" class="marketing-calculated">0</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Analytics Section -->
+                <div id="pnlAnalytics" class="pnl-analytics" style="display: none;">
+                    <h4>📈 Финансовая аналитика</h4>
+                    <div class="analytics-grid">
+                        <div class="analytics-item">
+                            <span class="analytics-label">Общая прибыль/убыток:</span>
+                            <span id="totalProfitLoss" class="analytics-value">0 PLN</span>
+                        </div>
+                        <div class="analytics-item">
+                            <span class="analytics-label">Изменение к прошлому месяцу:</span>
+                            <span id="balanceChange" class="analytics-value">0 PLN</span>
+                        </div>
+                        <div class="analytics-item">
+                            <span class="analytics-label">ROI (%):</span>
+                            <span id="roi" class="analytics-value">0%</span>
+                        </div>
+                        <div class="analytics-item">
+                            <span class="analytics-label">Оборотка (мес):</span>
+                            <span id="turnover" class="analytics-value">0</span>
+                        </div>
+                        <div class="analytics-item">
+                            <span class="analytics-label">Кэш флоу:</span>
+                            <span id="cashFlow" class="analytics-value">0 PLN</span>
+                        </div>
+                        <div class="analytics-item">
+                            <span class="analytics-label">Маржинальность (%):</span>
+                            <span id="margin" class="analytics-value">0%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Categories Tab Content -->
+        <div class="tab-content" id="categories-tab">
+            <div class="section-card">
+                <h3>📋 Управление категориями</h3>
+                <div class="categories-controls">
+                    <button id="loadCategoriesBtn" class="secondary-btn">Загрузить категории</button>
+                    <button id="addCategoryBtn" class="primary-btn">Добавить категорию</button>
+                </div>
+                
+                <div id="categoriesList" class="categories-list">
+                    <p>Нажмите "Загрузить категории" для просмотра</p>
+                </div>
+                
+                <div id="addCategoryForm" class="add-category-form" style="display: none;">
+                    <h4>Добавить новую категорию</h4>
+                    <input type="text" id="categoryName" placeholder="Название категории">
+                    <select id="categoryType">
+                        <option value="income">Доходы</option>
+                        <option value="expense">Расходы</option>
+                    </select>
+                    <textarea id="categoryDescription" placeholder="Описание (необязательно)"></textarea>
+                    <div class="form-actions">
+                        <button id="saveCategoryBtn" class="primary-btn">Сохранить</button>
+                        <button id="cancelCategoryBtn" class="secondary-btn">Отмена</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rules Tab Content -->
+        <div class="tab-content" id="rules-tab">
+            <div class="section-card">
+                <h3>📏 Управление правилами категоризации</h3>
+                <div class="rules-controls">
+                    <button id="loadRulesBtn" class="secondary-btn">Загрузить правила</button>
+                    <button id="addRuleBtn" class="primary-btn">Добавить правило</button>
+                </div>
+                
+                <div id="rulesList" class="rules-list">
+                    <p>Нажмите "Загрузить правила" для просмотра</p>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
+        // Глобальные переменные
+        let selectedFile = null;
+        let categories = [];
+        let rules = [];
+        let currentResults = null;
+
+        // Проверяем режим разработки
+        function isLocalhost() {
+            return window.location.hostname === 'localhost' || 
+                   window.location.hostname === '127.0.0.1' ||
+                   window.location.port === '3000';
+        }
+
+        // Вспомогательная функция для получения токена авторизации
+        function getAuthToken() {
+            // На localhost не требуем авторизацию
+            if (isLocalhost()) {
+                return null;
+            }
+            
+            try {
+                const userData = JSON.parse(localStorage.getItem('user') || '{}');
+                return userData.token || null;
+            } catch (e) {
+                console.warn('Could not parse user data for auth token:', e);
+                return null;
+            }
+        }
+
+        // Вспомогательная функция для получения заголовков с авторизацией
+        function getAuthHeaders(additionalHeaders = {}) {
+            const headers = {
+                'Content-Type': 'application/json',
+                ...additionalHeaders
+            };
+            
+            // На localhost не добавляем заголовок авторизации
+            if (!isLocalhost()) {
+                const token = getAuthToken();
+                if (token) {
+                    headers['Authorization'] = `Bearer ${token}`;
+                }
+            } else {
+                console.log('Localhost mode: skipping authorization header');
+            }
+            
+            return headers;
+        }
+
         // Загружаем информацию о пользователе
         document.addEventListener('DOMContentLoaded', function() {
             const user = localStorage.getItem('user');
-            if (user) {
+            
+            // Если это localhost, создаем фиктивного пользователя если нет
+            if (isLocalhost()) {
+                if (!user) {
+                    const devUser = {
+                        name: 'Developer',
+                        email: 'dev@localhost.com',
+                        picture: 'https://via.placeholder.com/40',
+                        token: 'dev-token-localhost',
+                        loginTime: new Date().toISOString()
+                    };
+                    localStorage.setItem('user', JSON.stringify(devUser));
+                    console.log('Создан фиктивный пользователь для localhost:', devUser);
+                }
+            } else if (user) {
+                // В продакшене проверяем пользователя
                 try {
                     const userData = JSON.parse(user);
                     document.getElementById('userName').textContent = userData.name;
@@ -147,7 +1117,318 @@
                 // Если нет данных пользователя, перенаправляем на авторизацию
                 window.location.href = '/';
             }
+
+            // Инициализация обработчиков событий
+            initializeEventHandlers();
+            
+            // Устанавливаем текущий месяц
+            const currentMonth = new Date().getMonth() + 1;
+            document.getElementById('monthSelect').value = currentMonth;
+            
+            // Устанавливаем текущий год в селекторе P&L
+            const currentYear = new Date().getFullYear();
+            const pnlYearSelect = document.getElementById('pnlYearSelect');
+            if (pnlYearSelect) {
+                pnlYearSelect.value = currentYear;
+            }
         });
+
+        // Инициализация обработчиков событий
+        function initializeEventHandlers() {
+            // CSV файл
+            document.getElementById('csvFile').addEventListener('change', handleFileSelect);
+            document.getElementById('uploadBtn').addEventListener('click', handleFileUpload);
+
+            // Категории
+            document.getElementById('loadCategoriesBtn').addEventListener('click', loadCategories);
+            document.getElementById('addCategoryBtn').addEventListener('click', showAddCategoryForm);
+            document.getElementById('saveCategoryBtn').addEventListener('click', saveCategory);
+            document.getElementById('cancelCategoryBtn').addEventListener('click', hideAddCategoryForm);
+
+            // Правила
+            document.getElementById('loadRulesBtn').addEventListener('click', loadRules);
+
+            // PNL Table
+            document.getElementById('loadPNLBtn').addEventListener('click', loadPNLTable);
+            document.getElementById('refreshPNLBtn').addEventListener('click', refreshPNLTable);
+
+            // Результаты CSV обработки
+            document.getElementById('exportResultsBtn').addEventListener('click', exportResults);
+            document.getElementById('saveResultsBtn').addEventListener('click', saveResults);
+            document.getElementById('clearResultsBtn').addEventListener('click', clearResults);
+
+            // Навигация по вкладкам
+            const navTabs = document.querySelectorAll('.nav-tab');
+            navTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const targetTab = this.getAttribute('data-tab');
+                    switchTab(targetTab);
+                });
+            });
+        }
+
+        // Обработка выбора файла
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                selectedFile = file;
+                document.getElementById('fileName').textContent = file.name;
+                document.getElementById('uploadBtn').disabled = false;
+                showStatus('Файл выбран: ' + file.name, 'success');
+            } else {
+                selectedFile = null;
+                document.getElementById('fileName').textContent = '';
+                document.getElementById('uploadBtn').disabled = true;
+            }
+        }
+
+        // Загрузка файла
+        async function handleFileUpload() {
+            if (!selectedFile) {
+                showStatus('Сначала выберите файл', 'error');
+                return;
+            }
+
+            const year = document.getElementById('yearSelect').value;
+            const month = document.getElementById('monthSelect').value;
+
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+            formData.append('year', year);
+            formData.append('month', month);
+
+            showStatus('Обработка файла...', 'loading');
+            document.getElementById('uploadBtn').disabled = true;
+
+            try {
+                const fetchOptions = {
+                    method: 'POST',
+                    body: formData
+                };
+
+                // Добавляем заголовок авторизации только если не localhost
+                if (!isLocalhost()) {
+                    const token = getAuthToken();
+                    if (token) {
+                        fetchOptions.headers = {
+                            'Authorization': `Bearer ${token}`
+                        };
+                        console.log('Added Authorization header for CSV upload');
+                    }
+                } else {
+                    console.log('Localhost mode: skipping authorization for CSV upload');
+                }
+
+                const response = await fetch('/api/csv/analyze-csv', fetchOptions);
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showStatus(`Файл обработан успешно! Операций: ${result.operations?.length || 0}`, 'success');
+                    
+                    // Отображаем результаты на странице
+                    displayProcessingResults(result);
+                    
+                    // Показываем детали результата в консоли для отладки
+                    console.log('Результат обработки:', result);
+                } else {
+                    showStatus('Ошибка: ' + (result.error || 'Неизвестная ошибка'), 'error');
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки:', error);
+                showStatus('Ошибка загрузки: ' + error.message, 'error');
+            } finally {
+                document.getElementById('uploadBtn').disabled = false;
+            }
+        }
+
+        // Загрузка категорий
+        async function loadCategories() {
+            showStatus('Загрузка категорий...', 'loading');
+            
+            try {
+                const headers = getAuthHeaders({ 'Content-Type': undefined }); // Убираем Content-Type для GET запроса
+                delete headers['Content-Type']; // GET запросы не должны иметь Content-Type
+                
+                const response = await fetch('/api/categories', {
+                    headers: headers
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    categories = result.categories || [];
+                    displayCategories(categories);
+                    showStatus(`Загружено категорий: ${categories.length}`, 'success');
+                } else {
+                    showStatus('Ошибка загрузки категорий: ' + result.error, 'error');
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки категорий:', error);
+                showStatus('Ошибка загрузки категорий: ' + error.message, 'error');
+            }
+        }
+
+        // Отображение категорий
+        function displayCategories(categories) {
+            const container = document.getElementById('categoriesList');
+            
+            if (!categories || categories.length === 0) {
+                container.innerHTML = '<p>Категории не найдены</p>';
+                return;
+            }
+
+            const incomeCategories = categories.filter(c => c.type === 'income');
+            const expenseCategories = categories.filter(c => c.type === 'expense');
+
+            container.innerHTML = `
+                <div class="categories-type-group">
+                    <h4>💰 Доходы (${incomeCategories.length})</h4>
+                    ${incomeCategories.map(cat => `
+                        <div class="category-item income">
+                            <span>${cat.name}</span>
+                            <button onclick="deleteCategory('${cat.id}')" class="delete-btn">✕</button>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="categories-type-group">
+                    <h4>💸 Расходы (${expenseCategories.length})</h4>
+                    ${expenseCategories.map(cat => `
+                        <div class="category-item expense">
+                            <span>${cat.name}</span>
+                            <button onclick="deleteCategory('${cat.id}')" class="delete-btn">✕</button>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // Сохранение категории
+        async function saveCategory() {
+            const name = document.getElementById('categoryName').value.trim();
+            const type = document.getElementById('categoryType').value;
+            const description = document.getElementById('categoryDescription').value.trim();
+
+            if (!name) {
+                showStatus('Введите название категории', 'error');
+                return;
+            }
+
+            showStatus('Сохранение категории...', 'loading');
+
+            try {
+                const response = await fetch('/api/categories', {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify({
+                        name,
+                        type,
+                        description: description || name
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showStatus('Категория сохранена успешно', 'success');
+                    hideAddCategoryForm();
+                    loadCategories(); // Перезагружаем список
+                } else {
+                    showStatus('Ошибка сохранения: ' + result.error, 'error');
+                }
+            } catch (error) {
+                console.error('Ошибка сохранения категории:', error);
+                showStatus('Ошибка сохранения: ' + error.message, 'error');
+            }
+        }
+
+        // Загрузка правил
+        async function loadRules() {
+            showStatus('Загрузка правил...', 'loading');
+            
+            try {
+                const headers = getAuthHeaders({ 'Content-Type': undefined });
+                delete headers['Content-Type'];
+                
+                const response = await fetch('/api/rules', {
+                    headers: headers
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    rules = result.rules || [];
+                    displayRules(rules);
+                    showStatus(`Загружено правил: ${rules.length}`, 'success');
+                } else {
+                    showStatus('Ошибка загрузки правил: ' + result.error, 'error');
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки правил:', error);
+                showStatus('Ошибка загрузки правил: ' + error.message, 'error');
+            }
+        }
+
+        // Отображение правил
+        function displayRules(rules) {
+            const container = document.getElementById('rulesList');
+            
+            if (!rules || rules.length === 0) {
+                container.innerHTML = '<p>Правила не найдены</p>';
+                return;
+            }
+
+            container.innerHTML = rules.map(rule => `
+                <div class="rule-item">
+                    <div class="rule-pattern"><strong>${rule.pattern}</strong></div>
+                    <div class="rule-category">→ ${rule.categories?.name || 'Unknown'}</div>
+                    <div class="rule-stats">Использований: ${rule.usage_count || 0}</div>
+                    <button onclick="deleteRule('${rule.id}')" class="delete-btn">✕</button>
+                </div>
+            `).join('');
+        }
+
+        // Вспомогательные функции для UI
+        function showAddCategoryForm() {
+            document.getElementById('addCategoryForm').style.display = 'block';
+            document.getElementById('categoryName').value = '';
+            document.getElementById('categoryDescription').value = '';
+        }
+
+        function hideAddCategoryForm() {
+            document.getElementById('addCategoryForm').style.display = 'none';
+        }
+
+        function showStatus(message, type = 'info') {
+            const statusEl = document.getElementById('uploadStatus');
+            statusEl.textContent = message;
+            statusEl.className = `upload-status ${type}`;
+            statusEl.style.display = 'block';
+            
+            // Автоматически скрываем через 5 секунд для успешных сообщений
+            if (type === 'success' || type === 'info') {
+                setTimeout(() => {
+                    statusEl.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        // Функции для удаления (пока заглушки)
+        async function deleteCategory(categoryId) {
+            if (!confirm('Удалить категорию?')) return;
+            showStatus('Удаление категории...', 'loading');
+            // TODO: реализовать API вызов для удаления
+            setTimeout(() => {
+                showStatus('Функция удаления будет реализована', 'info');
+            }, 1000);
+        }
+
+        async function deleteRule(ruleId) {
+            if (!confirm('Удалить правило?')) return;
+            showStatus('Удаление правила...', 'loading');
+            // TODO: реализовать API вызов для удаления
+            setTimeout(() => {
+                showStatus('Функция удаления будет реализована', 'info');
+            }, 1000);
+        }
         
         // Функция выхода
         function logout() {
@@ -160,6 +1441,886 @@
             
             // Перенаправляем на страницу авторизации
             window.location.href = '/';
+        }
+
+        // Функция для отображения результатов обработки CSV
+        function displayProcessingResults(result) {
+            currentResults = result;
+            
+            // Показываем секцию результатов
+            document.getElementById('resultsSection').style.display = 'block';
+            
+            // Отображаем сводку
+            displayResultsSummary(result);
+            
+            // Отображаем список операций
+            displayOperationsList(result.operations || []);
+        }
+
+        // Функция для отображения сводки результатов
+        function displayResultsSummary(result) {
+            const summaryDiv = document.getElementById('resultsSummary');
+            const summary = result.summary || {};
+            
+            summaryDiv.innerHTML = `
+                <h4>Сводка обработки</h4>
+                <div class="summary-item">
+                    <strong>Всего операций:</strong> 
+                    <span class="summary-value">${summary.totalOperations || 0}</span>
+                </div>
+                <div class="summary-item">
+                    <strong>Найденные валюты:</strong> 
+                    <span class="summary-value">${(summary.currenciesFound || []).join(', ')}</span>
+                </div>
+                <div class="summary-item">
+                    <strong>Общая сумма (PLN):</strong> 
+                    <span class="summary-value">${summary.totalPLNAmount || 0}</span>
+                </div>
+                <div class="summary-item">
+                    <strong>Метод категоризации:</strong> 
+                    <span class="summary-value">${summary.categorizationMethod || 'неизвестно'}</span>
+                </div>
+                <div class="summary-item">
+                    <strong>Курсы валют:</strong> 
+                    <span class="summary-value">${summary.exchangeRates ? Object.entries(summary.exchangeRates).map(([curr, rate]) => `${curr}: ${rate}`).join(', ') : 'нет данных'}</span>
+                </div>
+            `;
+        }
+
+        // Функция для отображения списка операций
+        function displayOperationsList(operations) {
+            const operationsList = document.getElementById('operationsList');
+            const operationsCount = document.getElementById('operationsCount');
+            
+            operationsCount.textContent = operations.length;
+            
+            if (operations.length === 0) {
+                operationsList.innerHTML = '<p>Операции не найдены</p>';
+                return;
+            }
+            
+            // Создаем заголовок таблицы
+            const header = document.createElement('div');
+            header.className = 'operation-item operation-header';
+            header.innerHTML = `
+                <div>Дата</div>
+                <div>Описание</div>
+                <div>Сумма</div>
+                <div>Валюта</div>
+                <div>Сумма (PLN)</div>
+                <div>Категория</div>
+                <div>Действия</div>
+            `;
+            operationsList.innerHTML = '';
+            operationsList.appendChild(header);
+            
+            // Добавляем операции
+            operations.forEach(operation => {
+                const operationDiv = document.createElement('div');
+                operationDiv.className = 'operation-item editable';
+                
+                const operationType = operation.operation_type || (operation.amount >= 0 ? 'income' : 'expense');
+                const amountClass = operationType === 'income' ? 'income' : 'expense';
+                const amountSign = operation.amount >= 0 ? '+' : '';
+                
+                operationDiv.innerHTML = `
+                    <div class="operation-date">${operation.date || 'N/A'}</div>
+                    <div class="operation-description">${operation.description || 'N/A'}</div>
+                    <div class="operation-amount ${amountClass}">${amountSign}${operation.original_amount || operation.amount || 0}</div>
+                    <div class="operation-currency">${operation.original_currency || operation.currency || 'N/A'}</div>
+                    <div class="operation-amount-pln">${operation.amount_pln || 0} PLN</div>
+                    <div class="operation-category" data-operation-index="${operations.indexOf(operation)}">${operation.category || 'Не определена'}</div>
+                    <div class="operation-actions">
+                        <button class="delete-operation-btn" data-operation-index="${operations.indexOf(operation)}" title="Удалить операцию">🗑️</button>
+                    </div>
+                `;
+                
+                // Добавляем обработчик событий без inline handler
+                const categoryElement = operationDiv.querySelector('.operation-category');
+                if (categoryElement) {
+                    const operationIndex = operations.indexOf(operation);
+                    categoryElement.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('Category element clicked:', {
+                            element: this,
+                            operationIndex: operationIndex,
+                            dataset: this.dataset
+                        });
+                        editOperationCategory(this, operationIndex);
+                    });
+                } else {
+                    console.error('Category element not found for operation:', operations.indexOf(operation));
+                }
+                
+                // Добавляем обработчик для кнопки удаления
+                const deleteBtn = operationDiv.querySelector('.delete-operation-btn');
+                if (deleteBtn) {
+                    const operationIndex = operations.indexOf(operation);
+                    deleteBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('Delete button clicked for operation:', operationIndex);
+                        deleteOperation(operationIndex);
+                    });
+                } else {
+                    console.error('Delete button not found for operation:', operations.indexOf(operation));
+                }
+                
+                operationsList.appendChild(operationDiv);
+            });
+        }
+
+        // Функция для редактирования категории операции
+        function editOperationCategory(element, operationIndex) {
+            console.log('editOperationCategory called:', {
+                element: element,
+                operationIndex: operationIndex,
+                currentResults: !!currentResults,
+                operations: currentResults?.operations?.length
+            });
+            
+            if (!currentResults || !currentResults.operations || !currentResults.operations[operationIndex]) {
+                console.error('Invalid data for category editing:', {
+                    currentResults: !!currentResults,
+                    operations: currentResults?.operations,
+                    operationIndex: operationIndex
+                });
+                showStatus('Ошибка: данные операции недоступны', 'error');
+                return;
+            }
+            
+            const operation = currentResults.operations[operationIndex];
+            const availableCategories = currentResults.categories || {};
+            const allCategories = [...(availableCategories.income || []), ...(availableCategories.expense || [])];
+            
+            console.log('Available categories:', allCategories);
+            
+            if (allCategories.length === 0) {
+                showStatus('Нет доступных категорий для редактирования', 'error');
+                return;
+            }
+            
+            // Проверяем, не находимся ли мы уже в режиме редактирования
+            if (element.querySelector('select')) {
+                console.log('Already in edit mode');
+                return;
+            }
+            
+            // Сохраняем исходное содержимое
+            const originalContent = element.innerHTML;
+            
+            // Создаем селект для выбора категории
+            const select = document.createElement('select');
+            select.className = 'category-edit-select';
+            select.style.cssText = 'width: 100%; padding: 4px; border: 1px solid #007bff; border-radius: 4px;';
+            
+            // Добавляем опцию "Без категории"
+            const noneOption = document.createElement('option');
+            noneOption.value = '';
+            noneOption.textContent = 'Без категории';
+            if (!operation.category || operation.category === '') {
+                noneOption.selected = true;
+            }
+            select.appendChild(noneOption);
+            
+            allCategories.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat;
+                option.textContent = cat;
+                if (cat === operation.category) {
+                    option.selected = true;
+                }
+                select.appendChild(option);
+            });
+            
+            // Заменяем содержимое категории на селект
+            element.innerHTML = '';
+            element.appendChild(select);
+            
+            // Обработчик изменения категории
+            const handleChange = function() {
+                const newCategory = this.value;
+                console.log('Category changed to:', newCategory, 'for operation index:', operationIndex);
+                
+                // Обновляем данные
+                if (currentResults && currentResults.operations && currentResults.operations[operationIndex]) {
+                    currentResults.operations[operationIndex].category = newCategory;
+                }
+                
+                // Возвращаем обычное отображение
+                element.innerHTML = newCategory || 'Не определена';
+                element.style.backgroundColor = newCategory ? '#e8f5e8' : '#fff3cd';
+                
+                showStatus(`Категория изменена на: ${newCategory || 'без категории'}`, 'success');
+            };
+            
+            // Обработчик потери фокуса (если пользователь кликнул вне селекта)
+            const handleBlur = function() {
+                setTimeout(() => {
+                    if (select.parentNode === element) {
+                        handleChange.call(select);
+                    }
+                }, 200);
+            };
+            
+            select.addEventListener('change', handleChange);
+            select.addEventListener('blur', handleBlur);
+            
+            // Обработчик Esc для отмены
+            const handleKeyDown = function(e) {
+                if (e.key === 'Escape') {
+                    element.innerHTML = originalContent;
+                }
+            };
+            
+            select.addEventListener('keydown', handleKeyDown);
+            
+            // Фокус на селект
+            select.focus();
+            
+            console.log('Category editing setup complete');
+        }
+
+        // Функция для удаления операции из списка
+        function deleteOperation(operationIndex) {
+            if (!currentResults || !currentResults.operations) {
+                showStatus('Нет операций для удаления', 'error');
+                return;
+            }
+
+            if (operationIndex < 0 || operationIndex >= currentResults.operations.length) {
+                showStatus('Неверный индекс операции', 'error');
+                return;
+            }
+
+            // Удаляем операцию из массива без подтверждения
+            currentResults.operations.splice(operationIndex, 1);
+            
+            // Обновляем отображение списка операций
+            displayOperationsList(currentResults.operations);
+            
+            // Обновляем счетчик операций
+            const operationsCount = document.getElementById('operationsCount');
+            if (operationsCount) {
+                operationsCount.textContent = `Всего операций: ${currentResults.operations.length}`;
+            }
+            
+            // Обновляем сводку результатов
+            displayResultsSummary(currentResults);
+            
+            showStatus(`Операция удалена. Осталось операций: ${currentResults.operations.length}`, 'success');
+        }
+
+        // Функция для экспорта результатов
+        function exportResults() {
+            if (!currentResults) {
+                showStatus('Нет результатов для экспорта', 'error');
+                return;
+            }
+            
+            const dataStr = JSON.stringify(currentResults, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `csv_results_${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            
+            URL.revokeObjectURL(url);
+            showStatus('Результаты экспортированы', 'success');
+        }
+
+        // Функция для сохранения результатов в базу данных
+        async function saveResults() {
+            if (!currentResults) {
+                showStatus('Нет результатов для сохранения', 'error');
+                return;
+            }
+            
+            if (!currentResults.operations || currentResults.operations.length === 0) {
+                showStatus('Нет операций для сохранения', 'error');
+                return;
+            }
+            
+            showStatus('Сохранение в базу данных...', 'loading');
+            
+            try {
+                const payload = {
+                    operations: currentResults.operations,
+                    year: currentResults.year,
+                    month: currentResults.month
+                };
+                
+                // Используем вспомогательную функцию для получения заголовков с авторизацией
+                const headers = getAuthHeaders();
+                
+                const response = await fetch('/api/csv/save-results', {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify(payload)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    if (result.demo) {
+                        showStatus(`🔄 [ДЕМО РЕЖИМ] ${result.message}`, 'info');
+                    } else {
+                        showStatus(`✅ Сохранено ${result.operationsCount || currentResults.operations.length} операций в базу данных`, 'success');
+                    }
+                    
+                    // Обновляем PNL таблицу, если она существует на странице
+                    if (typeof loadPNLData === 'function') {
+                        loadPNLData(currentResults.year, currentResults.month);
+                    }
+                    
+                    // Обновляем список категорий, так как могли быть созданы новые
+                    if (typeof loadCategories === 'function') {
+                        loadCategories();
+                    }
+                    
+                    // Можно скрыть результаты после успешного сохранения (только если не демо)
+                    // if (!result.demo) clearResults();
+                } else {
+                    // Если данные уже существуют и есть возможность перезаписи
+                    if (response.status === 409 && result.overwriteAvailable) {
+                        showStatusWithOverwrite(`Ошибка сохранения: ${result.error}`, result.error);
+                    } else {
+                        showStatus(`Ошибка сохранения: ${result.error}`, 'error');
+                    }
+                }
+                
+            } catch (error) {
+                console.error('Ошибка при сохранении:', error);
+                showStatus(`Ошибка сохранения: ${error.message}`, 'error');
+            }
+        }
+
+        // Функция для показа статуса с кнопкой перезаписи
+        function showStatusWithOverwrite(message, errorMessage) {
+            const statusElement = document.getElementById('uploadStatus');
+            statusElement.innerHTML = `
+                <div style="color: #e74c3c; margin-bottom: 10px;">
+                    ⚠️ ${message}
+                </div>
+                <button id="overwriteBtn" 
+                        style="background: #e74c3c; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">
+                    Перезаписать существующие данные
+                </button>
+            `;
+            statusElement.style.display = 'block';
+            
+            // Добавляем обработчик событий для кнопки перезаписи
+            const overwriteBtn = document.getElementById('overwriteBtn');
+            if (overwriteBtn) {
+                overwriteBtn.addEventListener('click', saveResultsWithOverwrite);
+            }
+        }
+
+        // Функция для сохранения с перезаписью
+        async function saveResultsWithOverwrite() {
+            if (!currentResults) {
+                showStatus('Нет результатов для сохранения', 'error');
+                return;
+            }
+            
+            if (!currentResults.operations || currentResults.operations.length === 0) {
+                showStatus('Нет операций для сохранения', 'error');
+                return;
+            }
+            
+            showStatus('Перезапись данных в базе...', 'loading');
+            
+            try {
+                const payload = {
+                    operations: currentResults.operations,
+                    year: currentResults.year,
+                    month: currentResults.month,
+                    overwrite: true // Добавляем флаг перезаписи
+                };
+                
+                const headers = getAuthHeaders();
+                
+                const response = await fetch('/api/csv/save-results', {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify(payload)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    if (result.demo) {
+                        showStatus(`🔄 [ДЕМО РЕЖИМ] ${result.message}`, 'info');
+                    } else {
+                        showStatus(`✅ Перезаписано ${result.operationsCount || currentResults.operations.length} операций в базу данных`, 'success');
+                    }
+                    
+                    // Обновляем PNL таблицу
+                    if (typeof loadPNLData === 'function') {
+                        loadPNLData(currentResults.year, currentResults.month);
+                    }
+                    
+                    // Обновляем список категорий, так как могли быть созданы новые
+                    if (typeof loadCategories === 'function') {
+                        loadCategories();
+                    }
+                } else {
+                    showStatus(`Ошибка перезаписи: ${result.error}`, 'error');
+                }
+                
+            } catch (error) {
+                console.error('Ошибка при перезаписи:', error);
+                showStatus(`Ошибка перезаписи: ${error.message}`, 'error');
+            }
+        }
+
+        // Функция для очистки результатов
+        function clearResults() {
+            currentResults = null;
+            document.getElementById('resultsSection').style.display = 'none';
+            showStatus('Результаты очищены', 'success');
+        }
+
+        // PNL Table Functions
+        async function loadPNLTable() {
+            const year = document.getElementById('pnlYearSelect').value;
+            if (!year) {
+                showStatus('Выберите год для загрузки P&L данных', 'error');
+                return;
+            }
+
+            showStatus('Загрузка P&L данных...', 'loading');
+
+            try {
+                const headers = getAuthHeaders();
+                const response = await fetch(`/api/pnl?year=${year}`, {
+                    method: 'GET',
+                    headers: headers
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    displayPNLTable(result.data, year);
+                    showStatus(`P&L данные для ${year} года загружены`, 'success');
+                } else {
+                    // Даже при ошибке показываем пустую таблицу
+                    displayPNLTable(null, year);
+                    showStatus(`P&L таблица для ${year} года отображена (данные не найдены)`, 'info');
+                }
+            } catch (error) {
+                console.error('Ошибка при загрузке P&L данных:', error);
+                // Даже при ошибке показываем пустую таблицу
+                displayPNLTable(null, year);
+                showStatus(`P&L таблица отображена (ошибка загрузки данных)`, 'info');
+            }
+        }
+
+        async function refreshPNLTable() {
+            showStatus('Обновление P&L данных...', 'loading');
+            await loadPNLTable();
+        }
+
+        // Функция loadPNLData для обратной совместимости
+        async function loadPNLData(year, month) {
+            // Обновляем данные P&L таблицы, если пользователь находится на вкладке P&L
+            const pnlTab = document.getElementById('pnl-tab');
+            if (pnlTab && pnlTab.classList.contains('active')) {
+                // Пользователь уже на вкладке P&L, просто обновляем данные
+                document.getElementById('pnlYearSelect').value = year;
+                await loadPNLTable();
+            }
+            // Если пользователь не на вкладке P&L, ничего не делаем - не перекидываем
+        }
+
+        function displayPNLTable(pnlData, year) {
+            const container = document.getElementById('pnlTableContainer');
+            
+            // Всегда показываем полную таблицу, даже если данных нет
+            if (!pnlData || !pnlData.categories || pnlData.categories.length === 0) {
+                // Создаем пустую таблицу с базовыми категориями
+                pnlData = {
+                    categories: [
+                        { name: 'Sales', type: 'income' },
+                        { name: 'Consulting', type: 'income' },
+                        { name: 'Marketing', type: 'expense' },
+                        { name: 'Tools', type: 'expense' },
+                        { name: 'Office', type: 'expense' }
+                    ],
+                    data: {}
+                };
+            }
+
+            // Добавляем маркетинговые категории
+            const marketingCategories = [
+                { name: 'Лиды', type: 'marketing' },
+                { name: 'Сделки', type: 'marketing' },
+                { name: 'Конверсия (%)', type: 'marketing' },
+                { name: 'Цена лида (PLN)', type: 'marketing' },
+                { name: 'Цена сделки (PLN)', type: 'marketing' }
+            ];
+
+            // Объединяем все категории
+            const allCategories = [...pnlData.categories, ...marketingCategories];
+
+            const months = [
+                'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+                'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
+            ];
+
+            // Подготавливаем данные по категориям
+            const incomeCategories = pnlData.categories.filter(cat => cat.type === 'income');
+            const expenseCategories = pnlData.categories.filter(cat => cat.type === 'expense');
+
+            let tableHTML = `
+                <table class="pnl-table">
+                    <thead>
+                        <tr>
+                            <th style="min-width: 200px;">Категория</th>
+                            ${months.map((month, index) => 
+                                `<th class="month-cell">${month}</th>`
+                            ).join('')}
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            // Доходы
+            if (incomeCategories.length > 0) {
+                tableHTML += `<tr><td colspan="13" style="font-weight: bold; background: #e8f5e8;">💰 ДОХОДЫ</td></tr>`;
+                
+                incomeCategories.forEach(category => {
+                    tableHTML += `<tr class="category-row" data-category="${category.name}" data-type="income">`;
+                    tableHTML += `<td style="padding-left: 20px;">${category.name}</td>`;
+                    
+                    for (let month = 1; month <= 12; month++) {
+                        const amount = pnlData.data[category.name]?.[month] || 0;
+                        tableHTML += `
+                            <td class="month-cell editable-cell" 
+                                data-category="${category.name}" 
+                                data-month="${month}"
+                                data-type="income">
+                                ${amount > 0 ? amount.toFixed(2) : ''}
+                            </td>
+                        `;
+                    }
+                    tableHTML += '</tr>';
+                });
+            }
+
+            // Расходы
+            if (expenseCategories.length > 0) {
+                tableHTML += `<tr><td colspan="13" style="font-weight: bold; background: #ffeaa7;">💸 РАСХОДЫ</td></tr>`;
+                
+                expenseCategories.forEach(category => {
+                    tableHTML += `<tr class="category-row" data-category="${category.name}" data-type="expense">`;
+                    tableHTML += `<td style="padding-left: 20px;">${category.name}</td>`;
+                    
+                    for (let month = 1; month <= 12; month++) {
+                        const amount = pnlData.data[category.name]?.[month] || 0;
+                        tableHTML += `
+                            <td class="month-cell editable-cell" 
+                                data-category="${category.name}" 
+                                data-month="${month}"
+                                data-type="expense">
+                                ${amount > 0 ? amount.toFixed(2) : ''}
+                            </td>
+                        `;
+                    }
+                    tableHTML += '</tr>';
+                });
+            }
+
+            // Маркетинговые метрики
+            if (marketingCategories.length > 0) {
+                tableHTML += `<tr><td colspan="13" style="font-weight: bold; background: #e3f2fd;">📈 МАРКЕТИНГОВЫЕ МЕТРИКИ</td></tr>`;
+                
+                marketingCategories.forEach(category => {
+                    tableHTML += `<tr class="category-row" data-category="${category.name}" data-type="marketing">`;
+                    tableHTML += `<td style="padding-left: 20px;">${category.name}</td>`;
+                    
+                    for (let month = 1; month <= 12; month++) {
+                        const amount = pnlData.data[category.name]?.[month] || 0;
+                        tableHTML += `
+                            <td class="month-cell editable-cell" 
+                                data-category="${category.name}" 
+                                data-month="${month}"
+                                data-type="marketing">
+                                ${amount > 0 ? amount.toFixed(2) : ''}
+                            </td>
+                        `;
+                    }
+                    tableHTML += '</tr>';
+                });
+            }
+
+            // Итоговая строка
+            tableHTML += '<tr class="total-row"><td style="font-weight: bold;">ИТОГО</td>';
+            for (let month = 1; month <= 12; month++) {
+                const incomeTotal = incomeCategories.reduce((sum, cat) => sum + (pnlData.data[cat.name]?.[month] || 0), 0);
+                const expenseTotal = expenseCategories.reduce((sum, cat) => sum + (pnlData.data[cat.name]?.[month] || 0), 0);
+                const total = incomeTotal - expenseTotal;
+                
+                tableHTML += `
+                    <td class="month-cell" style="font-weight: bold; color: ${total >= 0 ? '#28a745' : '#dc3545'};">
+                        ${total !== 0 ? total.toFixed(2) : ''}
+                    </td>
+                `;
+            }
+            tableHTML += '</tr>';
+
+            tableHTML += '</tbody></table>';
+            container.innerHTML = tableHTML;
+
+            // Добавляем обработчики для редактирования ячеек
+            addCellEditHandlers();
+
+            // Скрываем старый маркетинговый блок, так как метрики теперь в таблице
+            const marketingSection = document.getElementById('marketingSection');
+            if (marketingSection) {
+                marketingSection.style.display = 'none';
+            }
+            
+            // Показываем аналитику
+            const analyticsSection = document.getElementById('pnlAnalytics');
+            if (analyticsSection) {
+                analyticsSection.style.display = 'block';
+            }
+
+            // Обновляем аналитику
+            updatePNLAnalytics(pnlData);
+        }
+
+        function addCellEditHandlers() {
+            document.querySelectorAll('.editable-cell').forEach(cell => {
+                cell.addEventListener('click', function() {
+                    const category = this.dataset.category;
+                    const month = this.dataset.month;
+                    const type = this.dataset.type;
+                    const currentValue = this.textContent.trim();
+
+                    // Заменяем содержимое на input
+                    this.innerHTML = `<input type="number" value="${currentValue}" step="0.01">`;
+                    const input = this.querySelector('input');
+                    input.focus();
+                    input.select();
+
+                    // Обработчики для сохранения/отмены редактирования
+                    const saveEdit = async () => {
+                        const newValue = parseFloat(input.value) || 0;
+                        this.textContent = newValue > 0 ? newValue.toFixed(2) : '';
+                        this.className = 'month-cell editable-cell';
+                        
+                        // Сохраняем изменения в базу данных
+                        await savePNLCell(category, month, newValue, type);
+                    };
+
+                    const cancelEdit = () => {
+                        this.textContent = currentValue;
+                        this.className = 'month-cell editable-cell';
+                    };
+
+                    input.addEventListener('blur', saveEdit);
+                    input.addEventListener('keydown', function(e) {
+                        if (e.key === 'Enter') {
+                            saveEdit();
+                        } else if (e.key === 'Escape') {
+                            cancelEdit();
+                        }
+                    });
+                });
+            });
+        }
+
+        function setupMarketingCalculations() {
+            const leadsInput = document.getElementById('leadsInput');
+            const dealsInput = document.getElementById('dealsInput');
+            const adSpendInput = document.getElementById('adSpendInput');
+            const conversionInput = document.getElementById('conversionInput');
+            const costPerLead = document.getElementById('costPerLead');
+            const costPerDeal = document.getElementById('costPerDeal');
+
+            function calculateMarketingMetrics() {
+                const leads = parseFloat(leadsInput.value) || 0;
+                const deals = parseFloat(dealsInput.value) || 0;
+                const adSpend = parseFloat(adSpendInput.value) || 0;
+                const conversion = parseFloat(conversionInput.value) || 0;
+
+                // Автоматически рассчитываем конверсию если есть лиды и сделки
+                if (leads > 0 && deals > 0 && conversion === 0) {
+                    const autoConversion = ((deals / leads) * 100).toFixed(1);
+                    conversionInput.value = autoConversion;
+                }
+
+                // Цена лида = расходы на рекламу / количество лидов
+                const cpl = leads > 0 ? (adSpend / leads).toFixed(2) : '0.00';
+                costPerLead.textContent = `${cpl} PLN`;
+
+                // Цена сделки = расходы на рекламу / количество сделок
+                const cpd = deals > 0 ? (adSpend / deals).toFixed(2) : '0.00';
+                costPerDeal.textContent = `${cpd} PLN`;
+            }
+
+            // Добавляем обработчики событий для автоматических расчетов
+            [leadsInput, dealsInput, adSpendInput, conversionInput].forEach(input => {
+                if (input) {
+                    input.addEventListener('input', calculateMarketingMetrics);
+                }
+            });
+
+            // Первоначальный расчет
+            calculateMarketingMetrics();
+        }
+
+        // Функция для сохранения изменений ячейки P&L в базу данных
+        async function savePNLCell(category, month, value, type) {
+            try {
+                const year = document.getElementById('yearSelector')?.value || new Date().getFullYear();
+                
+                const response = await fetch('/api/pnl/update-cell', {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify({
+                        category: category,
+                        month: parseInt(month),
+                        year: parseInt(year),
+                        value: parseFloat(value),
+                        type: type
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    console.log('PNL cell saved successfully:', result.data);
+                    showStatus(`Ячейка ${category} (${month} месяц) обновлена`, 'success');
+                } else {
+                    console.error('Error saving PNL cell:', result.error);
+                    showStatus(`Ошибка сохранения: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                console.error('Error saving PNL cell:', error);
+                showStatus(`Ошибка сохранения: ${error.message}`, 'error');
+            }
+        }
+
+        function updatePNLAnalytics(pnlData) {
+            const analyticsDiv = document.getElementById('pnlAnalytics');
+            analyticsDiv.style.display = 'block';
+
+            // Расчеты для текущего месяца
+            const currentMonth = new Date().getMonth() + 1;
+            let currentIncome = 0;
+            let currentExpense = 0;
+            let previousIncome = 0;
+            let previousExpense = 0;
+
+            // Суммируем доходы и расходы по всем категориям
+            Object.keys(pnlData.data || {}).forEach(category => {
+                const categoryData = pnlData.data[category];
+                const categoryInfo = pnlData.categories.find(cat => cat.name === category);
+                
+                if (categoryInfo?.type === 'income') {
+                    currentIncome += categoryData?.[currentMonth] || 0;
+                    previousIncome += categoryData?.[currentMonth - 1] || 0;
+                } else {
+                    currentExpense += categoryData?.[currentMonth] || 0;
+                    previousExpense += categoryData?.[currentMonth - 1] || 0;
+                }
+            });
+
+            // Основные расчеты
+            const currentProfitLoss = currentIncome - currentExpense;
+            const previousProfitLoss = previousIncome - previousExpense;
+            const balanceChange = currentProfitLoss - previousProfitLoss;
+            
+            // ROI = (Прибыль / Доходы) * 100
+            const roi = currentIncome > 0 ? ((currentProfitLoss / currentIncome) * 100).toFixed(1) : '0.0';
+            
+            // Маржинальность = (Прибыль / Доходы) * 100 (то же что ROI)
+            const margin = currentIncome > 0 ? ((currentProfitLoss / currentIncome) * 100).toFixed(1) : '0.0';
+            
+            // Оборотка = 12 / (Средние расходы / Средние доходы) - упрощенная формула
+            const avgExpense = currentExpense;
+            const avgIncome = currentIncome;
+            const turnover = avgIncome > 0 && avgExpense > 0 ? (12 / (avgExpense / avgIncome)).toFixed(1) : '0';
+            
+            // Кэш флоу = Доходы - Расходы (то же что прибыль)
+            const cashFlow = currentProfitLoss;
+
+            // Обновляем значения в интерфейсе
+            document.getElementById('totalProfitLoss').textContent = `${currentProfitLoss.toFixed(2)} PLN`;
+            document.getElementById('balanceChange').textContent = `${balanceChange.toFixed(2)} PLN`;
+            document.getElementById('roi').textContent = `${roi}%`;
+            document.getElementById('margin').textContent = `${margin}%`;
+            document.getElementById('turnover').textContent = `${turnover} мес`;
+            document.getElementById('cashFlow').textContent = `${cashFlow.toFixed(2)} PLN`;
+        }
+
+        // Функция для автоматической загрузки P&L данных текущего года
+        async function loadPNLTableForCurrentYear() {
+            const currentYear = new Date().getFullYear();
+            
+            // Устанавливаем текущий год в селекторе
+            const yearSelect = document.getElementById('pnlYearSelect');
+            if (yearSelect) {
+                yearSelect.value = currentYear;
+            }
+            
+            showStatus('Загрузка P&L данных для текущего года...', 'loading');
+
+            try {
+                const headers = getAuthHeaders();
+                const response = await fetch(`/api/pnl?year=${currentYear}`, {
+                    method: 'GET',
+                    headers: headers
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    displayPNLTable(result.data, currentYear);
+                    showStatus(`P&L данные загружены для ${currentYear} года`, 'success');
+                } else {
+                    console.error('Error loading PNL data:', result.error);
+                    showStatus(`Ошибка загрузки P&L данных: ${result.error}`, 'error');
+                    // Показываем пустую таблицу при ошибке
+                    displayPNLTable(null, currentYear);
+                }
+            } catch (error) {
+                console.error('Error loading PNL data:', error);
+                showStatus(`Ошибка загрузки P&L данных: ${error.message}`, 'error');
+                // Показываем пустую таблицу при ошибке
+                displayPNLTable(null, currentYear);
+            }
+        }
+
+        // Функция переключения вкладок
+        function switchTab(tabName) {
+            // Убираем активный класс со всех вкладок
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Скрываем все содержимое вкладок
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Активируем выбранную вкладку
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+            
+            // Показываем содержимое выбранной вкладки
+            const tabContentId = tabName === 'main' ? 'main-tab' : `${tabName}-tab`;
+            document.getElementById(tabContentId).classList.add('active');
+            
+            // Автоматически загружаем P&L данные при переходе на вкладку P&L
+            if (tabName === 'pnl') {
+                loadPNLTableForCurrentYear();
+            }
         }
     </script>
 </body>

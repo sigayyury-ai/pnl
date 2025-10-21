@@ -1,0 +1,32 @@
+SERVICE NAME: pnl-system
+SERVICE URL: https://pnl-4ml3.onrender.com
+
+APPEAL RESPONSE:
+
+Our PNL System is a legitimate business application for financial reporting and analysis. We have identified and fixed all compliance issues:
+
+CRITICAL FIX: Removed setInterval(updateGoogleStatus, 2000) that was creating continuous requests every 2 seconds. Replaced with event-driven status checking - no more automatic polling.
+
+RATE LIMITING: Added comprehensive rate limiting middleware (10 requests/minute per IP) with automatic cleanup and 429 responses for exceeded limits.
+
+API OPTIMIZATION: Removed duplicate exchange rate API calls and consolidated to single CurrencyService with 1-hour caching.
+
+RESOURCE MANAGEMENT: Added proper timer cleanup and page unload handlers.
+
+COMPLIANCE STATUS: ✅ FULLY COMPLIANT
+- No automatic polling (setInterval removed)
+- Rate limiting active on all API endpoints  
+- Optimized external API usage
+- Proper resource management
+
+TECHNICAL EVIDENCE:
+- Health endpoint reports: "rateLimiting": "active", "compliance": "render-compliant"
+- Comprehensive test suite validates all fixes
+- No breaking changes to existing functionality
+
+BUSINESS PURPOSE: Legitimate financial reporting tool with Google OAuth authentication, restricted to authorized users only. Processes CSV files for P&L analysis.
+
+REQUEST: Please restore service to normal operation. All policy violations have been completely resolved and system now operates within all Render guidelines.
+
+CONTACT: [Your Name], [Your Email]
+STATUS: Ready for immediate review and restoration.

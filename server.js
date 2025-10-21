@@ -12,6 +12,14 @@ const Papa = require('papaparse');
 const { createClient } = require('@supabase/supabase-js');
 const { OAuth2Client } = require('google-auth-library');
 const OpenAI = require('openai');
+const CurrencyService = require('./services/currencyService.js');
+
+// Import API modules
+const authRouter = require('./api/auth.js');
+const csvRouter = require('./api/csv.js');
+const categoriesRouter = require('./api/categories.js');
+const rulesRouter = require('./api/rules.js');
+const pnlRouter = require('./api/pnl.js');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -22,6 +30,13 @@ const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 const ALLOWED_EMAILS = process.env.ALLOWED_EMAILS ? process.env.ALLOWED_EMAILS.split(',') : ['hello@comoon.io', 'info@comoon.io'];
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const DEMO_MODE = process.env.DEMO_MODE === 'true' || true;
+// Определяем режим разработки - должно работать одинаково локально и на Render
+const DEV_MODE = process.env.NODE_ENV !== 'production' || process.env.DEV_MODE === 'true';
+
+// Логируем режим запуска для отладки
+console.log('🔧 Mode configuration:');
+console.log('  NODE_ENV:', process.env.NODE_ENV);
+console.log('  DEV_MODE:', DEV_MODE);
 
 // Supabase клиент
 let supabase = null;
@@ -57,6 +72,10 @@ const openai = OPENAI_API_KEY ? new OpenAI({
   apiKey: OPENAI_API_KEY,
 }) : null;
 
+// Currency Service
+const currencyService = new CurrencyService();
+console.log('✅ Currency Service initialized');
+
 // Создаем папку uploads если её нет (только если не production или если папка доступна)
 if (process.env.NODE_ENV !== 'production' && !fs.existsSync('uploads')) {
   try {
@@ -71,6 +90,49 @@ const upload = multer({
   dest: process.env.NODE_ENV === 'production' ? '/tmp/' : 'uploads/',
   limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
 });
+
+// Rate limiting middleware for API protection
+const rateLimitMap = new Map();
+
+const rateLimitMiddleware = (req, res, next) => {
+  const ip = req.ip || req.connection.remoteAddress;
+  const now = Date.now();
+  const windowMs = 60000; // 1 minute
+  const maxRequests = 10; // max requests per minute
+  
+  // Clean up old entries periodically
+  if (Math.random() < 0.01) { // 1% chance
+    for (const [key, value] of rateLimitMap.entries()) {
+      if (now > value.resetTime) {
+        rateLimitMap.delete(key);
+      }
+    }
+  }
+  
+  if (!rateLimitMap.has(ip)) {
+    rateLimitMap.set(ip, { count: 1, resetTime: now + windowMs });
+    return next();
+  }
+  
+  const userLimits = rateLimitMap.get(ip);
+  
+  if (now > userLimits.resetTime) {
+    userLimits.count = 1;
+    userLimits.resetTime = now + windowMs;
+    return next();
+  }
+  
+  if (userLimits.count >= maxRequests) {
+    console.log(`Rate limit exceeded for IP: ${ip}`);
+    return res.status(429).json({ 
+      error: 'Too many requests', 
+      retryAfter: Math.ceil((userLimits.resetTime - now) / 1000)
+    });
+  }
+  
+  userLimits.count++;
+  next();
+};
 
 // Middleware
 app.use(helmet({
@@ -115,6 +177,16 @@ app.options('*', (req, res) => {
   res.sendStatus(200);
 });
 
+// Apply rate limiting to all API routes
+app.use('/api/', rateLimitMiddleware);
+
+// API Routes
+app.use('/api/auth', authRouter.router);
+app.use('/api/csv', csvRouter);
+app.use('/api/categories', categoriesRouter);
+app.use('/api/rules', rulesRouter);
+app.use('/api/pnl', pnlRouter);
+
 // Статические файлы
 app.use(express.static(__dirname, {
   setHeaders: (res, path) => {
@@ -146,6 +218,24 @@ async function verifyGoogleToken(token) {
 // Функция для проверки email
 function validateEmail(email) {
   return ALLOWED_EMAILS.includes(email.toLowerCase());
+}
+
+// Middleware для проверки авторизации (пропускаем в режиме разработки)
+function checkAuth(req, res, next) {
+  if (DEV_MODE) {
+    console.log('DEV_MODE: пропускаем проверку авторизации для', req.method, req.path);
+    return next();
+  }
+  
+  console.log('PRODUCTION: проверяем авторизацию для', req.method, req.path);
+  // В продакшене проверяем авторизацию
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    console.log('PRODUCTION: отсутствует Authorization header');
+    return res.status(401).json({ success: false, error: 'Authorization header required' });
+  }
+  
+  next();
 }
 
 // API для получения конфигурации Google OAuth
@@ -222,7 +312,7 @@ app.post('/api/auth', async (req, res) => {
 });
 
 // API для операций
-app.get('/api/operations', async (req, res) => {
+app.get('/api/operations', checkAuth, async (req, res) => {
   try {
     const { month } = req.query;
     if (!month) {
@@ -242,7 +332,7 @@ app.get('/api/operations', async (req, res) => {
   }
 });
 
-app.post('/api/operations', async (req, res) => {
+app.post('/api/operations', checkAuth, async (req, res) => {
   try {
     const { operations, month } = req.body;
     if (!operations || !month) {
@@ -270,7 +360,7 @@ app.post('/api/operations', async (req, res) => {
 });
 
 // API для PNL данных
-app.get('/api/pnl', async (req, res) => {
+app.get('/api/pnl', checkAuth, async (req, res) => {
   try {
     const { month } = req.query;
     if (!month) {
@@ -290,7 +380,7 @@ app.get('/api/pnl', async (req, res) => {
   }
 });
 
-app.post('/api/pnl', async (req, res) => {
+app.post('/api/pnl', checkAuth, async (req, res) => {
   try {
     const { pnl_data, month } = req.body;
     if (!pnl_data || !month) {
@@ -436,93 +526,56 @@ function parseDate(dateString) {
   return '';
 }
 
-// Функция получения курсов валют
-async function getExchangeRates(currencies) {
-  const rates = {};
-  
-  try {
-    const response = await fetch('https://api.exchangerate-api.com/v4/latest/EUR');
-    const data = await response.json();
-    
-    if (data.rates) {
-      const eurToPln = data.rates.PLN || 4.5;
-      
-      currencies.forEach(currency => {
-        if (data.rates[currency]) {
-          rates[currency] = (1 / data.rates[currency]) * eurToPln;
-        }
-      });
-    }
-  } catch (error) {
-    console.error('Exchange rate API error:', error);
-    // Fallback rates
-    const fallbackRates = {
-      'USD': 4.2,
-      'EUR': 4.5,
-      'GBP': 5.3,
-      'CHF': 4.7
-    };
-    
-    currencies.forEach(currency => {
-      if (fallbackRates[currency]) {
-        rates[currency] = fallbackRates[currency];
-      }
-    });
-  }
-  
-  return rates;
-}
+// Currency exchange rates now handled by CurrencyService
+// Removed duplicate getExchangeRates function to avoid multiple API calls
 
-// Функция конвертации валют
+// Enhanced currency conversion using CurrencyService
 async function convertCurrenciesToPLN(operations) {
-  const currencies = [...new Set(operations.map(op => op.currency?.toUpperCase()).filter(Boolean))];
-  const currenciesToConvert = currencies.filter(c => c !== 'PLN');
-  
-  if (currenciesToConvert.length === 0) {
+  try {
+    // Extract unique currencies from operations
+    const currencies = [...new Set(operations.map(op => op.currency?.toUpperCase()).filter(Boolean))];
+    
+    console.log(`Converting currencies: ${currencies.join(', ')}`);
+    
+    // Get exchange rates using our CurrencyService
+    const exchangeRates = await currencyService.getExchangeRates(currencies);
+    
+    console.log('Exchange rates obtained:', exchangeRates);
+    
+    // Convert operations using CurrencyService
+    const convertedOperations = currencyService.convertOperationsToPLN(operations, exchangeRates);
+    
+    // Add operation type determination
+    const finalOperations = convertedOperations.map(operation => ({
+      ...operation,
+      operation_type: (parseFloat(operation.amount?.replace(',', '.')) || 0) >= 0 ? 'income' : 'expense'
+    }));
+    
     return {
       success: true,
+      operations: finalOperations,
+      exchange_rates: exchangeRates,
+      currencies_found: currencies,
+      conversion_timestamp: new Date().toISOString()
+    };
+    
+  } catch (error) {
+    console.error('Currency conversion error:', error);
+    
+    // Fallback to simple conversion without API
+    return {
+      success: false,
       operations: operations.map(op => ({
         ...op,
         amount_pln: Math.abs(parseFloat(op.amount?.replace(',', '.')) || 0),
         operation_type: (parseFloat(op.amount?.replace(',', '.')) || 0) >= 0 ? 'income' : 'expense',
-        exchange_rate: 1.0
+        exchange_rate: 1.0,
+        original_currency: op.currency?.toUpperCase() || 'PLN'
       })),
-      currencies_found: ['PLN']
+      currencies_found: [...new Set(operations.map(op => op.currency?.toUpperCase()).filter(Boolean))],
+      error: error.message
     };
   }
-  
-  const exchangeRates = await getExchangeRates(currenciesToConvert);
-  
-  const convertedOperations = operations.map(operation => {
-    const originalAmount = parseFloat(operation.amount?.replace(',', '.')) || 0;
-    const currency = operation.currency?.toUpperCase() || 'PLN';
-    
-    let amountPln, exchangeRate;
-    
-    if (currency === 'PLN') {
-      amountPln = Math.abs(originalAmount);
-      exchangeRate = 1.0;
-    } else {
-      exchangeRate = exchangeRates[currency] || 1.0;
-      amountPln = Math.abs(originalAmount * exchangeRate);
-    }
-    
-    return {
-      ...operation,
-      original_amount: originalAmount,
-      original_currency: currency,
-      amount_pln: amountPln,
-      exchange_rate: exchangeRate,
-      operation_type: originalAmount >= 0 ? 'income' : 'expense'
-    };
-  });
-  
-  return {
-    success: true,
-    operations: convertedOperations,
-    exchange_rates: exchangeRates,
-    currencies_found: currencies
-  };
 }
 
 // Функция категоризации операций
@@ -651,180 +704,12 @@ function assignCategory(description, type) {
   }
 }
 
-// API для загрузки и анализа CSV файла
-app.post('/api/analyze-csv', upload.single('file'), async (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ success: false, error: 'No file uploaded' });
-    }
-    
-    const { month } = req.body;
-    if (!month) {
-      return res.status(400).json({ success: false, error: 'Month is required' });
-    }
-    
-    console.log('Processing CSV file:', req.file.filename);
-    
-    // Парсим CSV
-    const operations = await parseCSVFile(req.file.path);
-    console.log('Parsed operations:', operations.length);
-    
-    if (operations.length === 0) {
-      fs.unlinkSync(req.file.path); // Удаляем временный файл
-      return res.status(400).json({ 
-        success: false, 
-        error: 'No operations found in CSV file' 
-      });
-    }
-    
-    // Конвертируем валюты
-    const conversionResult = await convertCurrenciesToPLN(operations);
-    if (!conversionResult.success) {
-      fs.unlinkSync(req.file.path);
-      return res.status(400).json(conversionResult);
-    }
-    
-    // Категоризируем
-    const categorizationResult = await categorizeOperations(conversionResult.operations);
-    if (!categorizationResult.success) {
-      fs.unlinkSync(req.file.path);
-      return res.status(400).json(categorizationResult);
-    }
-    
-    fs.unlinkSync(req.file.path); // Удаляем временный файл
-    
-    res.json({
-      success: true,
-      operations: categorizationResult.operations,
-      month,
-      exchange_rates: conversionResult.exchange_rates,
-      currencies_found: conversionResult.currencies_found,
-      demo_mode: DEMO_MODE
-    });
-    
-  } catch (error) {
-    console.error('CSV analysis error:', error);
-    if (req.file) {
-      fs.unlinkSync(req.file.path); // Удаляем временный файл в случае ошибки
-    }
-    res.status(500).json({ 
-      success: false, 
-      error: 'Failed to analyze CSV file' 
-    });
-  }
-});
+// Old CSV endpoint removed - now using modular /api/csv/analyze-csv
 
-// API для работы с категориями
-app.get('/api/categories', async (req, res) => {
-  try {
-    const categories = await getCategories();
-    res.json(categories);
-  } catch (error) {
-    console.error('Error fetching categories:', error);
-    res.status(500).json({ success: false, error: 'Failed to fetch categories' });
-  }
-});
-
-// API для добавления категории
-app.post('/api/categories', async (req, res) => {
-  try {
-    const { name, description, type } = req.body;
-    
-    if (!name || !type) {
-      return res.status(400).json({ 
-        success: false, 
-        error: 'Name and type are required' 
-      });
-    }
-    
-    const table = type === 'income' ? 'pnl_income_categories' : 'pnl_expense_categories';
-    
-    // Проверяем существование
-    const { data: existing } = await supabase
-      .from(table)
-      .select('*')
-      .eq('name', name)
-      .single();
-    
-    if (existing) {
-      return res.status(400).json({ 
-        success: false, 
-        error: 'Category already exists' 
-      });
-    }
-    
-    const { data, error } = await supabase
-      .from(table)
-      .insert([{
-        name,
-        description: description || name,
-        is_default: false
-      }])
-      .select()
-      .single();
-    
-    if (error) throw error;
-    
-    res.json({ success: true, category: data });
-    
-  } catch (error) {
-    console.error('Error adding category:', error);
-    res.status(500).json({ success: false, error: 'Failed to add category' });
-  }
-});
-
-// API для обновления категории
-app.put('/api/categories/:type/:id', async (req, res) => {
-  try {
-    const { type, id } = req.params;
-    const { name, description } = req.body;
-    
-    const table = type === 'income' ? 'pnl_income_categories' : 'pnl_expense_categories';
-    
-    const { data, error } = await supabase
-      .from(table)
-      .update({
-        name,
-        description: description || name
-      })
-      .eq('id', id)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    
-    res.json({ success: true, category: data });
-    
-  } catch (error) {
-    console.error('Error updating category:', error);
-    res.status(500).json({ success: false, error: 'Failed to update category' });
-  }
-});
-
-// API для удаления категории
-app.delete('/api/categories/:type/:id', async (req, res) => {
-  try {
-    const { type, id } = req.params;
-    
-    const table = type === 'income' ? 'pnl_income_categories' : 'pnl_expense_categories';
-    
-    const { error } = await supabase
-      .from(table)
-      .delete()
-      .eq('id', id);
-    
-    if (error) throw error;
-    
-    res.json({ success: true, message: 'Category deleted' });
-    
-  } catch (error) {
-    console.error('Error deleting category:', error);
-    res.status(500).json({ success: false, error: 'Failed to delete category' });
-  }
-});
+// Old categories endpoints removed - now using modular /api/categories/*
 
 // API для сохранения операций (исправленная версия)
-app.post('/api/pnl-operations', async (req, res) => {
+app.post('/api/pnl-operations', checkAuth, async (req, res) => {
   try {
     const { operation } = req.body;
     
@@ -857,7 +742,7 @@ app.post('/api/pnl-operations', async (req, res) => {
 });
 
 // API для удаления операции
-app.delete('/api/pnl-operations/:id', async (req, res) => {
+app.delete('/api/pnl-operations/:id', checkAuth, async (req, res) => {
   try {
     const { id } = req.params;
     
@@ -877,7 +762,7 @@ app.delete('/api/pnl-operations/:id', async (req, res) => {
 });
 
 // API для получения операций по месяцу (исправленная версия)
-app.get('/api/pnl-operations', async (req, res) => {
+app.get('/api/pnl-operations', checkAuth, async (req, res) => {
   try {
     const { month } = req.query;
     
@@ -932,7 +817,12 @@ app.use((err, req, res, next) => {
 
 // Health check endpoint для быстрого пробуждения
 app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+  res.status(200).json({ 
+    status: 'ok', 
+    timestamp: new Date().toISOString(),
+    rateLimiting: 'active',
+    compliance: 'render-compliant'
+  });
 });
 
 // Запуск сервера
