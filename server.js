@@ -126,6 +126,14 @@ function validateEmail(email) {
   return ALLOWED_EMAILS.includes(email.toLowerCase());
 }
 
+// API для получения конфигурации Google OAuth
+app.get('/api/config', (req, res) => {
+  res.json({
+    googleClientId: GOOGLE_CLIENT_ID,
+    allowedEmails: ALLOWED_EMAILS
+  });
+});
+
 // API для авторизации
 app.post('/api/auth', async (req, res) => {
   try {

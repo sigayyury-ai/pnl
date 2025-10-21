@@ -1,11 +1,21 @@
-// Google OAuth конфигурация - правильный Client ID
-const GOOGLE_CLIENT_ID = '728085463649-jj9dlee9rek2r0k429sh6i6m9ec8582n.apps.googleusercontent.com';
+// Google OAuth конфигурация - будет загружена с сервера
+let GOOGLE_CLIENT_ID = null;
+let ALLOWED_EMAILS = ['hello@comoon.io', 'info@comoon.io'];
 
-// Разрешенные email адреса
-const ALLOWED_EMAILS = [
-    'hello@comoon.io',
-    'info@comoon.io'
-];
+// Загружаем конфигурацию с сервера
+async function loadConfig() {
+    try {
+        const response = await fetch('/api/config');
+        const config = await response.json();
+        GOOGLE_CLIENT_ID = config.googleClientId;
+        ALLOWED_EMAILS = config.allowedEmails;
+        console.log('Конфигурация загружена:', { GOOGLE_CLIENT_ID, ALLOWED_EMAILS });
+    } catch (error) {
+        console.error('Ошибка загрузки конфигурации:', error);
+        // Fallback значения
+        GOOGLE_CLIENT_ID = '728085463649-jj9dlee9rek2r0k429sh6i6m9ec8582n.apps.googleusercontent.com';
+    }
+}
 
 // Проверка email
 function validateEmail(email) {
@@ -13,7 +23,13 @@ function validateEmail(email) {
 }
 
 // Инициализация Google Sign-In
-function initializeGoogleSignIn() {
+async function initializeGoogleSignIn() {
+    // Сначала загружаем конфигурацию если ещё не загружена
+    if (!GOOGLE_CLIENT_ID) {
+        console.log('Загружаем конфигурацию...');
+        await loadConfig();
+    }
+    
     // Ждем загрузки Google библиотеки
     if (typeof google === 'undefined') {
         console.log('Ожидание загрузки Google Sign-In...');
@@ -21,8 +37,8 @@ function initializeGoogleSignIn() {
         return;
     }
     
-    if (google.accounts && google.accounts.id) {
-        console.log('Инициализация Google Sign-In...');
+    if (google.accounts && google.accounts.id && GOOGLE_CLIENT_ID) {
+        console.log('Инициализация Google Sign-In с Client ID:', GOOGLE_CLIENT_ID);
         google.accounts.id.initialize({
             client_id: GOOGLE_CLIENT_ID,
             callback: handleCredentialResponse,
@@ -34,10 +50,13 @@ function initializeGoogleSignIn() {
         checkAuthStatus();
         console.log('Google Sign-In инициализирован успешно');
     } else {
-        console.error('Google Sign-In не загружен');
+        console.error('Google Sign-In не загружен или отсутствует Client ID');
         // Показываем ошибку пользователю
-        document.getElementById('googleSignIn').innerHTML = '❌ Ошибка загрузки Google Sign-In';
-        document.getElementById('googleSignIn').disabled = true;
+        const button = document.getElementById('googleSignIn');
+        if (button) {
+            button.innerHTML = '❌ Ошибка загрузки Google Sign-In';
+            button.disabled = true;
+        }
     }
 }
 
@@ -171,14 +190,21 @@ document.addEventListener('DOMContentLoaded', function() {
     updateGoogleStatus();
     
     // Обработчик кнопки Google
-    document.getElementById('googleSignIn').addEventListener('click', function(e) {
+    document.getElementById('googleSignIn').addEventListener('click', async function(e) {
         e.preventDefault();
         console.log('Клик по кнопке Google Sign-In');
+        
+        // Убеждаемся что конфигурация загружена
+        if (!GOOGLE_CLIENT_ID) {
+            await loadConfig();
+        }
+        
         console.log('Google объект доступен:', typeof google !== 'undefined');
         console.log('Google accounts доступен:', typeof google !== 'undefined' && google.accounts);
         console.log('Google accounts.id доступен:', typeof google !== 'undefined' && google.accounts && google.accounts.id);
+        console.log('Client ID доступен:', GOOGLE_CLIENT_ID);
         
-        if (typeof google !== 'undefined' && google.accounts && google.accounts.id) {
+        if (typeof google !== 'undefined' && google.accounts && google.accounts.id && GOOGLE_CLIENT_ID) {
             console.log('Запуск Google Sign-In...');
             try {
                 google.accounts.id.prompt();
@@ -191,7 +217,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 );
             }
         } else {
-            console.error('Google Sign-In не загружен. Попытка повторной инициализации...');
+            console.error('Google Sign-In не загружен или отсутствует Client ID. Попытка повторной инициализации...');
             setTimeout(() => {
                 initializeGoogleSignIn();
             }, 1000);
