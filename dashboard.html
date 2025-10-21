@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PNL System - Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .dashboard-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .welcome-card {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .welcome-card h1 {
+            color: #28a745;
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+        }
+        
+        .welcome-card p {
+            color: #666;
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+        }
+        
+        .user-info {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .user-info h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .user-info p {
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .logout-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.2s ease;
+        }
+        
+        .logout-btn:hover {
+            background: #c82333;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .feature-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .feature-card h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .feature-card p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="welcome-card">
+            <h1>🎉 Hello World!</h1>
+            <p>Добро пожаловать в PNL System!</p>
+            
+            <div class="user-info" id="userInfo">
+                <h3>Информация о пользователе:</h3>
+                <p><strong>Имя:</strong> <span id="userName">Загрузка...</span></p>
+                <p><strong>Email:</strong> <span id="userEmail">Загрузка...</span></p>
+            </div>
+            
+            <button class="logout-btn" onclick="logout()">Выйти из системы</button>
+        </div>
+        
+        <div class="features">
+            <div class="feature-card">
+                <h3>📊 PNL Анализ</h3>
+                <p>Анализ прибыли и убытков с автоматической категоризацией</p>
+            </div>
+            
+            <div class="feature-card">
+                <h3>🤖 AI Категоризация</h3>
+                <p>Автоматическая категоризация транзакций с помощью ChatGPT</p>
+            </div>
+            
+            <div class="feature-card">
+                <h3>💱 Конвертация валют</h3>
+                <p>Автоматическая конвертация валют в PLN</p>
+            </div>
+            
+            <div class="feature-card">
+                <h3>📈 Отчеты</h3>
+                <p>Детальные отчеты и аналитика по финансам</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Загружаем информацию о пользователе
+        document.addEventListener('DOMContentLoaded', function() {
+            const user = localStorage.getItem('user');
+            if (user) {
+                try {
+                    const userData = JSON.parse(user);
+                    document.getElementById('userName').textContent = userData.name;
+                    document.getElementById('userEmail').textContent = userData.email;
+                } catch (error) {
+                    console.error('Ошибка загрузки данных пользователя:', error);
+                    // Если нет данных пользователя, перенаправляем на авторизацию
+                    window.location.href = '/';
+                }
+            } else {
+                // Если нет данных пользователя, перенаправляем на авторизацию
+                window.location.href = '/';
+            }
+        });
+        
+        // Функция выхода
+        function logout() {
+            localStorage.removeItem('user');
+            
+            // Выход из Google аккаунта
+            if (typeof google !== 'undefined' && google.accounts) {
+                google.accounts.id.disableAutoSelect();
+            }
+            
+            // Перенаправляем на страницу авторизации
+            window.location.href = '/';
+        }
+    </script>
+</body>
+</html>
+
+

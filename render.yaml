@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: pnl-system
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    # Render автоматически усыпляет сервисы после 15 минут неактивности
+    # и просыпает при первом запросе (cold start ~30 секунд)
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: DEMO_MODE
+        value: "true"
